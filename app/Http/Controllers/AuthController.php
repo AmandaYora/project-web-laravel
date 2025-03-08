@@ -2,43 +2,46 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
     public function login()
     {
-        if (Auth::check()) {
-            return redirect()->route('users.index');
-        }
         return view('auth.login');
     }
 
     public function authenticate(Request $request)
     {
-        $credentials = $request->validate([
+        $request->validate([
             'username' => 'required',
-            'password' => 'required',
+            'password' => 'required'
         ]);
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            $user = Auth::user();
-            session(['user' => $user]);
-            return redirect()->intended(route('users.index'));
+        $user = User::where('username', $request->username)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return redirect()->back()->with('error', 'Invalid credentials');
         }
 
-        return back()->withErrors([
-            'username' => 'The provided credentials do not match our records.',
-        ])->onlyInput('username');
+        $userData = $user->toArray();
+        
+        if ($user->role === 'guru') {
+            $userData['guru'] = $user->guru;
+        } elseif ($user->role === 'siswa') {
+            $userData['siswa'] = $user->siswa;
+        }
+
+        session(['user' => $userData]);
+        
+        return redirect()->route('dashboard')->with('success', 'Login successful');
     }
 
-    public function logout(Request $request)
+    public function logout()
     {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return redirect()->route('auth.login');
+        session()->forget('user');
+        return redirect()->route('auth.login')->with('success', 'Logged out successfully');
     }
 }
