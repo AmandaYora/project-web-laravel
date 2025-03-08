@@ -10,6 +10,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
+Route::redirect('/', '/login');
+
 Route::controller(AuthController::class)->group(function () {
     Route::get('/login', 'login')->name('auth.login');
     Route::post('/login', 'authenticate')->name('auth.authenticate');
