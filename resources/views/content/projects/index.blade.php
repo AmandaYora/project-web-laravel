@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Users Management')
+@section('title', 'Projects Management')
 
 @section('content')
     <div class="row">
@@ -8,9 +8,9 @@
             <div class="card">
                 <div class="card-body">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h6 class="card-title mb-0">Data Users</h6>
+                        <h6 class="card-title mb-0">Projects</h6>
                         <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#addEditUserModal">
+                            data-bs-target="#addEditProjectModal">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
@@ -45,31 +45,48 @@
                         <table id="dataTableExample" class="table">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Phone</th>
-                                    <th>Email</th>
-                                    <th>Username</th>
-                                    <th>Role</th>
+                                    <th>Project Name</th>
+                                    <th>Description</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Progress</th>
+                                    <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($users as $user)
-                                    <tr data-user="{{ json_encode($user) }}">
-                                        <td>{{ $user->name }}</td>
-                                        <td>{{ $user->phone }}</td>
-                                        <td>{{ $user->email }}</td>
-                                        <td>{{ $user->username }}</td>
-                                        <td>{{ $user->role }}</td>
+                                @foreach ($projects as $project)
+                                    <tr data-project="{{ json_encode($project) }}">
+                                        <td>{{ $project->project_name }}</td>
+                                        <td>{{ Str::limit($project->description, 50) }}</td>
+                                        <td>{{ $project->start_date }}</td>
+                                        <td>{{ $project->end_date }}</td>
                                         <td>
+                                            <div class="progress">
+                                                <div class="progress-bar" role="progressbar" style="width: {{ $project->progress }}%"
+                                                    aria-valuenow="{{ $project->progress }}" aria-valuemin="0" aria-valuemax="100">
+                                                    {{ $project->progress }}%
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{{ $project->status === 'Completed' ? 'success' : ($project->status === 'In Progress' ? 'primary' : ($project->status === 'On Hold' ? 'warning' : 'secondary')) }}">
+                                                {{ $project->status }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('projects.show', $project->project_id) }}" 
+                                               class="btn btn-sm btn-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
                                             <button type="button" class="btn btn-sm btn-info edit-btn"
-                                                data-bs-toggle="modal" data-bs-target="#addEditUserModal">
+                                                data-bs-toggle="modal" data-bs-target="#addEditProjectModal">
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                             <button type="button" class="btn btn-sm btn-danger delete-btn">
                                                 <i class="fas fa-trash"></i>
                                             </button>
-                                            <form method="POST" action="{{ route('users.delete', $user->user_id) }}"
+                                            <form method="POST" action="{{ route('projects.delete', $project->project_id) }}"
                                                 style="display:none;" class="delete-form">
                                                 @csrf
                                                 @method('DELETE')
@@ -85,47 +102,47 @@
         </div>
     </div>
 
-    <!-- Modal for add/edit user -->
-    <div class="modal fade" id="addEditUserModal" tabindex="-1" aria-labelledby="addEditUserModalLabel"
+    <!-- Modal for add/edit project -->
+    <div class="modal fade" id="addEditProjectModal" tabindex="-1" aria-labelledby="addEditProjectModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addEditUserModalLabel">Add/Edit User</h5>
+                    <h5 class="modal-title" id="addEditProjectModalLabel">Add/Edit Project</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" action="{{ route('users.save') }}" id="userForm">
+                <form method="POST" action="{{ route('projects.save') }}" id="projectForm">
                     @csrf
-                    <input type="hidden" name="user_id" id="user_id">
+                    <input type="hidden" name="project_id" id="project_id">
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                            <label for="project_name" class="form-label">Project Name</label>
+                            <input type="text" class="form-control" id="project_name" name="project_name" required>
                         </div>
                         <div class="mb-3">
-                            <label for="phone" class="form-label">Phone</label>
-                            <input type="text" class="form-control" id="phone" name="phone" required>
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
                         </div>
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
+                            <label for="start_date" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date">
                         </div>
                         <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" required>
+                            <label for="end_date" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date">
                         </div>
                         <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password">
-                            <small class="text-muted">Leave empty to keep current password when editing</small>
+                            <label for="progress" class="form-label">Progress (%)</label>
+                            <input type="number" class="form-control" id="progress" name="progress" min="0" max="100" value="0">
                         </div>
                         <div class="mb-3">
-                            <label for="role" class="form-label">Role</label>
-                            <select class="form-select" id="role" name="role" required>
-                                <option value="">Select Role</option>
-                                <option value="admin">Admin</option>
-                                <option value="manager">Manager</option>
-                                <option value="pengawas">Pengawas</option>
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="">Select Status</option>
+                                <option value="Pending">Pending</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="On Hold">On Hold</option>
+                                <option value="Completed">Completed</option>
                             </select>
                         </div>
                     </div>
@@ -143,21 +160,22 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
-            $('#addEditUserModal').on('hidden.bs.modal', function() {
-                $('#userForm')[0].reset();
-                $('#user_id').val('');
+            $('#addEditProjectModal').on('hidden.bs.modal', function() {
+                $('#projectForm')[0].reset();
+                $('#project_id').val('');
             });
 
             $('.edit-btn').on('click', function() {
                 var row = $(this).closest('tr');
-                var user = row.data('user');
+                var project = row.data('project');
 
-                $('#user_id').val(user.user_id);
-                $('#name').val(user.name);
-                $('#phone').val(user.phone);
-                $('#email').val(user.email);
-                $('#username').val(user.username);
-                $('#role').val(user.role);
+                $('#project_id').val(project.project_id);
+                $('#project_name').val(project.project_name);
+                $('#description').val(project.description);
+                $('#start_date').val(project.start_date);
+                $('#end_date').val(project.end_date);
+                $('#progress').val(project.progress);
+                $('#status').val(project.status);
             });
 
             setTimeout(function() {

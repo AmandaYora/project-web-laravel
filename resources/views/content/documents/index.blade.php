@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Users Management')
+@section('title', 'Documents Management')
 
 @section('content')
     <div class="row">
@@ -8,9 +8,9 @@
             <div class="card">
                 <div class="card-body">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h6 class="card-title mb-0">Data Users</h6>
+                        <h6 class="card-title mb-0">Documents</h6>
                         <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#addEditUserModal">
+                            data-bs-target="#addEditDocumentModal">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
@@ -45,31 +45,33 @@
                         <table id="dataTableExample" class="table">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Phone</th>
-                                    <th>Email</th>
-                                    <th>Username</th>
-                                    <th>Role</th>
+                                    <th>Document Name</th>
+                                    <th>Project</th>
+                                    <th>Uploaded By</th>
+                                    <th>Upload Date</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($users as $user)
-                                    <tr data-user="{{ json_encode($user) }}">
-                                        <td>{{ $user->name }}</td>
-                                        <td>{{ $user->phone }}</td>
-                                        <td>{{ $user->email }}</td>
-                                        <td>{{ $user->username }}</td>
-                                        <td>{{ $user->role }}</td>
+                                @foreach ($documents as $document)
+                                    <tr data-document="{{ json_encode($document) }}">
+                                        <td>{{ $document->document_name }}</td>
+                                        <td>{{ $document->project->project_name }}</td>
+                                        <td>{{ $document->user->name }}</td>
+                                        <td>{{ $document->created_at->format('Y-m-d H:i:s') }}</td>
                                         <td>
+                                            <a href="{{ route('documents.download', $document->document_id) }}" 
+                                               class="btn btn-sm btn-success">
+                                                <i class="fas fa-download"></i>
+                                            </a>
                                             <button type="button" class="btn btn-sm btn-info edit-btn"
-                                                data-bs-toggle="modal" data-bs-target="#addEditUserModal">
+                                                data-bs-toggle="modal" data-bs-target="#addEditDocumentModal">
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                             <button type="button" class="btn btn-sm btn-danger delete-btn">
                                                 <i class="fas fa-trash"></i>
                                             </button>
-                                            <form method="POST" action="{{ route('users.delete', $user->user_id) }}"
+                                            <form method="POST" action="{{ route('documents.delete', $document->document_id) }}"
                                                 style="display:none;" class="delete-form">
                                                 @csrf
                                                 @method('DELETE')
@@ -85,48 +87,36 @@
         </div>
     </div>
 
-    <!-- Modal for add/edit user -->
-    <div class="modal fade" id="addEditUserModal" tabindex="-1" aria-labelledby="addEditUserModalLabel"
+    <!-- Modal for add/edit document -->
+    <div class="modal fade" id="addEditDocumentModal" tabindex="-1" aria-labelledby="addEditDocumentModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addEditUserModalLabel">Add/Edit User</h5>
+                    <h5 class="modal-title" id="addEditDocumentModalLabel">Add/Edit Document</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" action="{{ route('users.save') }}" id="userForm">
+                <form method="POST" action="{{ route('documents.save') }}" id="documentForm" enctype="multipart/form-data">
                     @csrf
-                    <input type="hidden" name="user_id" id="user_id">
+                    <input type="hidden" name="document_id" id="document_id">
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">Phone</label>
-                            <input type="text" class="form-control" id="phone" name="phone" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password">
-                            <small class="text-muted">Leave empty to keep current password when editing</small>
-                        </div>
-                        <div class="mb-3">
-                            <label for="role" class="form-label">Role</label>
-                            <select class="form-select" id="role" name="role" required>
-                                <option value="">Select Role</option>
-                                <option value="admin">Admin</option>
-                                <option value="manager">Manager</option>
-                                <option value="pengawas">Pengawas</option>
+                            <label for="project_id" class="form-label">Project</label>
+                            <select class="form-select" id="project_id" name="project_id" required>
+                                <option value="">Select Project</option>
+                                @foreach($projects as $project)
+                                    <option value="{{ $project->project_id }}">{{ $project->project_name }}</option>
+                                @endforeach
                             </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="document_name" class="form-label">Document Name</label>
+                            <input type="text" class="form-control" id="document_name" name="document_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="document_file" class="form-label">File</label>
+                            <input type="file" class="form-control" id="document_file" name="document_file">
+                            <small class="text-muted">Leave empty to keep existing file when editing</small>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -143,21 +133,18 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
-            $('#addEditUserModal').on('hidden.bs.modal', function() {
-                $('#userForm')[0].reset();
-                $('#user_id').val('');
+            $('#addEditDocumentModal').on('hidden.bs.modal', function() {
+                $('#documentForm')[0].reset();
+                $('#document_id').val('');
             });
 
             $('.edit-btn').on('click', function() {
                 var row = $(this).closest('tr');
-                var user = row.data('user');
+                var document = row.data('document');
 
-                $('#user_id').val(user.user_id);
-                $('#name').val(user.name);
-                $('#phone').val(user.phone);
-                $('#email').val(user.email);
-                $('#username').val(user.username);
-                $('#role').val(user.role);
+                $('#document_id').val(document.document_id);
+                $('#project_id').val(document.project_id);
+                $('#document_name').val(document.document_name);
             });
 
             setTimeout(function() {

@@ -30,4 +30,19 @@ class User extends Authenticatable
         'extra' => 'array',
         'password' => 'hashed',
     ];
+
+    public function projectUsers()
+    {
+        return $this->hasMany(ProjectUser::class, 'user_id', 'user_id');
+    }
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class, 'assigned_to', 'user_id');
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class, 'uploaded_by', 'user_id');
+    }
 }

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Users Management')
+@section('title', 'Project Reports - ' . $project->project_name)
 
 @section('content')
     <div class="row">
@@ -8,11 +8,16 @@
             <div class="card">
                 <div class="card-body">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h6 class="card-title mb-0">Data Users</h6>
-                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                            data-bs-target="#addEditUserModal">
-                            <i class="fas fa-plus"></i>
-                        </button>
+                        <h6 class="card-title mb-0">Project Reports - {{ $project->project_name }}</h6>
+                        <div>
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#generateReportModal">
+                                <i class="fas fa-plus"></i> Generate Report
+                            </button>
+                            <a href="{{ route('projects.show', $project->project_id) }}" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-arrow-left"></i> Back to Project
+                            </a>
+                        </div>
                     </div>
 
                     @if (session('error'))
@@ -41,35 +46,29 @@
                         </div>
                     @endif
 
-                    <div class="table-responsive">
+                    <div class="table-responsive mt-3">
                         <table id="dataTableExample" class="table">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Phone</th>
-                                    <th>Email</th>
-                                    <th>Username</th>
-                                    <th>Role</th>
+                                    <th>Report Name</th>
+                                    <th>Generated Date</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($users as $user)
-                                    <tr data-user="{{ json_encode($user) }}">
-                                        <td>{{ $user->name }}</td>
-                                        <td>{{ $user->phone }}</td>
-                                        <td>{{ $user->email }}</td>
-                                        <td>{{ $user->username }}</td>
-                                        <td>{{ $user->role }}</td>
+                                @foreach ($reports as $report)
+                                    <tr>
+                                        <td>{{ $report->report_name }}</td>
+                                        <td>{{ $report->created_at->format('Y-m-d H:i:s') }}</td>
                                         <td>
-                                            <button type="button" class="btn btn-sm btn-info edit-btn"
-                                                data-bs-toggle="modal" data-bs-target="#addEditUserModal">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
+                                            <a href="{{ route('reports.download', $report->report_id) }}" 
+                                               class="btn btn-sm btn-success">
+                                                <i class="fas fa-download"></i>
+                                            </a>
                                             <button type="button" class="btn btn-sm btn-danger delete-btn">
                                                 <i class="fas fa-trash"></i>
                                             </button>
-                                            <form method="POST" action="{{ route('users.delete', $user->user_id) }}"
+                                            <form method="POST" action="{{ route('reports.delete', $report->report_id) }}"
                                                 style="display:none;" class="delete-form">
                                                 @csrf
                                                 @method('DELETE')
@@ -85,53 +84,34 @@
         </div>
     </div>
 
-    <!-- Modal for add/edit user -->
-    <div class="modal fade" id="addEditUserModal" tabindex="-1" aria-labelledby="addEditUserModalLabel"
+    <!-- Modal for generate report -->
+    <div class="modal fade" id="generateReportModal" tabindex="-1" aria-labelledby="generateReportModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addEditUserModalLabel">Add/Edit User</h5>
+                    <h5 class="modal-title" id="generateReportModalLabel">Generate Report</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" action="{{ route('users.save') }}" id="userForm">
+                <form method="POST" action="{{ route('reports.generate', $project->project_id) }}" id="reportForm">
                     @csrf
-                    <input type="hidden" name="user_id" id="user_id">
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                            <label for="report_name" class="form-label">Report Name</label>
+                            <input type="text" class="form-control" id="report_name" name="report_name" required>
                         </div>
                         <div class="mb-3">
-                            <label for="phone" class="form-label">Phone</label>
-                            <input type="text" class="form-control" id="phone" name="phone" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password">
-                            <small class="text-muted">Leave empty to keep current password when editing</small>
-                        </div>
-                        <div class="mb-3">
-                            <label for="role" class="form-label">Role</label>
-                            <select class="form-select" id="role" name="role" required>
-                                <option value="">Select Role</option>
-                                <option value="admin">Admin</option>
-                                <option value="manager">Manager</option>
-                                <option value="pengawas">Pengawas</option>
+                            <label for="format" class="form-label">Format</label>
+                            <select class="form-select" id="format" name="format" required>
+                                <option value="">Select Format</option>
+                                <option value="pdf">PDF</option>
+                                <option value="excel">Excel</option>
                             </select>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                        <button type="submit" class="btn btn-primary btn-sm">Generate</button>
                     </div>
                 </form>
             </div>
@@ -143,21 +123,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
-            $('#addEditUserModal').on('hidden.bs.modal', function() {
-                $('#userForm')[0].reset();
-                $('#user_id').val('');
-            });
-
-            $('.edit-btn').on('click', function() {
-                var row = $(this).closest('tr');
-                var user = row.data('user');
-
-                $('#user_id').val(user.user_id);
-                $('#name').val(user.name);
-                $('#phone').val(user.phone);
-                $('#email').val(user.email);
-                $('#username').val(user.username);
-                $('#role').val(user.role);
+            $('#generateReportModal').on('hidden.bs.modal', function() {
+                $('#reportForm')[0].reset();
             });
 
             setTimeout(function() {
