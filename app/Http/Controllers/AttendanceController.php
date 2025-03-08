@@ -7,6 +7,7 @@ use App\Models\ClassSession;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class AttendanceController extends Controller
 {
@@ -92,7 +93,7 @@ class AttendanceController extends Controller
             Attendance::create([
                 'class_session_id' => $session->class_session_id,
                 'user_id' => session('user.user_id'),
-                'clock_in' => date('H:i:s'),
+                'clock_in' => Carbon::now()->format('H:i'),
                 'date' => date('Y-m-d'),
                 'status' => $status
             ]);
