@@ -11,8 +11,8 @@ class {{ class }} extends Controller
 {
     public function index()
     {
-        $items = {{ model }}::all();
-        return view('content.{{ modelPluralKebab }}.index', compact('items'));
+        ${{ modelPluralKebab }} = {{ model }}::all();
+        return view('content.{{ modelPluralKebab }}.index', compact('{{ modelPluralKebab }}'));
     }
 
     public function save{{ model }}(Request $request)

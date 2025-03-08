@@ -30,4 +30,10 @@ class User extends Authenticatable
         'extra' => 'array',
         'password' => 'hashed',
     ];
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class, 'user_id', 'user_id');
+    }
+
 }
