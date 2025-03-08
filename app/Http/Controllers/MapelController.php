@@ -74,7 +74,8 @@ class MapelController extends Controller
             return redirect()->back()->with('success', 'Schedule deleted successfully');
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->back()->with('error', 'Error deleting schedule: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Jadwal sedang digunakan oleh Sesi kelas');
+            //return redirect()->back()->with('error', 'Error deleting schedule: ' . $e->getMessage());
         }
     }
 }

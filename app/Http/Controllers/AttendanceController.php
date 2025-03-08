@@ -165,7 +165,8 @@ class AttendanceController extends Controller
             return redirect()->back()->with('success', 'Attendance deleted successfully');
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->back()->with('error', 'Error deleting attendance: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Sesi kelas sudah digunakan oleh siswa');
+            //return redirect()->back()->with('error', 'Error deleting attendance: ' . $e->getMessage());
         }
     }
 

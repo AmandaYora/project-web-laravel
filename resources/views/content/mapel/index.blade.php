@@ -29,6 +29,18 @@
                         </div>
                     @endif
 
+                    @if ($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert" id="validationErrorAlert">
+                            <strong>Error!</strong> Silakan periksa inputan Anda.
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
                     <div class="table-responsive">
                         <table id="dataTableExample" class="table">
                             <thead>
@@ -178,6 +190,27 @@
                 $('#end_time').val(mapel.end_time);
                 $('#date').val(mapel.date);
             });
+
+            $('.delete-btn').on('click', function(e) {
+                e.preventDefault();
+                var form = $(this).siblings('.delete-form');
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "This action cannot be undone!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+
         });
     </script>
 @endpush

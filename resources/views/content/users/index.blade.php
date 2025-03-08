@@ -121,7 +121,7 @@
                             <h6>Guru Details</h6>
                             <div class="mb-3">
                                 <label for="nip" class="form-label">NIP</label>
-                                <input type="text" class="form-control" id="nip" name="nip">
+                                <input type="number" class="form-control" id="nip" name="nip">
                             </div>
                             <div class="mb-3">
                                 <label for="subject_id" class="form-label">Subject</label>
@@ -154,7 +154,7 @@
                             <h6>Siswa Details</h6>
                             <div class="mb-3">
                                 <label for="nis" class="form-label">NIS</label>
-                                <input type="text" class="form-control" id="nis" name="nis">
+                                <input type="number" class="form-control" id="nis" name="nis">
                             </div>
                             <div class="mb-3">
                                 <label for="tahun_masuk" class="form-label">Tahun Masuk</label>
@@ -202,6 +202,11 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
+
+        $('#phone').on('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
         $('#role').change(function() {
             var role = $(this).val();
             $('#guruFields').hide();
