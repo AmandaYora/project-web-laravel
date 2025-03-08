@@ -26,7 +26,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
             $user = Auth::user();
             session(['user' => $user]);
-            return redirect()->intended(route('users.index'));
+            return redirect()->intended(route('activities.index'));
         }
 
         return back()->withErrors([
