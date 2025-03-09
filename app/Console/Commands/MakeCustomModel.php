@@ -11,6 +11,7 @@ class MakeCustomModel extends GeneratorCommand
     protected $name = 'make:custom-model';
     protected $description = 'Membuat Model dengan tableName, primaryKey, dan fillable serta migration otomatis';
     protected $type = 'Model';
+    protected $additionalData;
 
     public function __construct(Filesystem $files)
     {
@@ -24,7 +25,7 @@ class MakeCustomModel extends GeneratorCommand
 
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace . '\\Models';
+        return $rootNamespace.'\\Models';
     }
 
     public function handle()
@@ -59,7 +60,7 @@ class MakeCustomModel extends GeneratorCommand
     {
         $primaryKey = $this->additionalData['primaryKey'];
         $fillableArray = $this->additionalData['fillable'];
-        $fillableString = "['" . implode("','", $fillableArray) . "']";
+        $fillableString = "['".implode("','", $fillableArray)."']";
         return str_replace(
             ['{{ primaryKey }}', '{{ fillable }}'],
             [$primaryKey, $fillableString],
@@ -70,17 +71,23 @@ class MakeCustomModel extends GeneratorCommand
     protected function createMigration()
     {
         $tableName = $this->additionalData['tableName'];
-        $migrationClass = 'Create' . Str::studly($tableName) . 'Table';
+        $migrationClass = 'Create'.Str::studly($tableName).'Table';
         $primaryKey = $this->additionalData['primaryKey'];
         if ($primaryKey === 'id') {
             $primaryKeyField = "\$table->id();";
         } else {
-            $primaryKeyField = "\$table->string('{$primaryKey}')->primary();";
+            $primaryKeyField = "\$table->id('{$primaryKey}');";
         }
-        $columns = "";
+        $columns = '';
         foreach ($this->additionalData['fillable'] as $column) {
-            if ($column === $primaryKey) continue;
-            $columns .= "\n            \$table->string('{$column}');";
+            if ($column === $primaryKey) {
+                continue;
+            }
+            if ($column === 'extra') {
+                $columns .= "\n            \$table->json('extra')->nullable();";
+            } else {
+                $columns .= "\n            \$table->string('{$column}');";
+            }
         }
         if (empty(trim($columns))) {
             $columns = "\n            // Tambahkan kolom lain di sini";

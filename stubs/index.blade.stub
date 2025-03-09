@@ -9,7 +9,7 @@
                 <div class="card-body">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h6 class="card-title mb-0">Data {{ title }}</h6>
-                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addEditModal">
+                        <button type="button" class="btn btn-primary btn-sm add-btn" data-bs-toggle="modal" data-bs-target="#addEditModal">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
@@ -118,7 +118,9 @@
                 });
             });
             $('#dataForm').validate({
-                submitHandler: function(form) { form.submit(); }
+                submitHandler: function(form) {
+                    form.submit();
+                }
             });
         });
     </script>
