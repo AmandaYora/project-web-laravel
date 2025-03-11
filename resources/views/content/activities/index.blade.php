@@ -48,7 +48,7 @@
                 <th>Time</th>
                 <th>Evidence</th>
                 <th>Description</th>
-                @if(session('user.user_id') == 'admin')
+                @if(session('user.role') == 'admin')
                   <th>Aksi</th>
                 @endif
               </tr>
@@ -64,7 +64,7 @@
                   <img src="{{ asset($item->evidence) }}" alt="Evidence" class="image-click" style="max-width:100px; cursor:pointer;">
                 </td>
                 <td>{{ $item->description }}</td>
-                @if(session('user.user_id') == 'admin')
+                @if(session('user.role') == 'admin')
                 <td>
                   <button type="button" class="btn btn-sm btn-info edit-btn" data-bs-toggle="modal" data-bs-target="#addEditModal">
                     <i class="fas fa-edit"></i>
