@@ -54,7 +54,7 @@ class ActivityController extends Controller
         }
         $extraData = [];
         foreach ($data as $key => $value) {
-            if (!in_array($key, ['task_id', 'status', 'date', 'time', 'evidence'])) {
+            if (!in_array($key, ['task_id', 'status', 'date', 'time', 'evidence', 'description'])) {
                 $extraData[$key] = $value;
                 unset($data[$key]);
             }
