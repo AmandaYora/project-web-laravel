@@ -9,4 +9,6 @@ class {{ class }} extends Model
     protected $primaryKey = '{{ primaryKey }}';
 
     protected $fillable = {{ fillable }};
+
+    protected $casts = {{ casts }};
 }

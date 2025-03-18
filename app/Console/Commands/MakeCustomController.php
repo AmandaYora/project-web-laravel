@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Eloquent\Model;
 
 class MakeCustomController extends GeneratorCommand
 {
@@ -12,6 +13,8 @@ class MakeCustomController extends GeneratorCommand
     protected $description = 'Membuat controller dengan template kustom';
     protected $type = 'Controller';
     protected $allowedColumns;
+    protected $modelClass;
+    protected $validationAttributes;
 
     protected function getStub()
     {
@@ -42,6 +45,7 @@ class MakeCustomController extends GeneratorCommand
 
         $this->validationAttributes = $this->generateValidationAttributes($this->modelClass);
         $this->allowedColumns = $this->generateAllowedColumns($this->modelClass);
+
         $result = parent::handle();
 
         if ($result !== false) {
@@ -74,7 +78,8 @@ class MakeCustomController extends GeneratorCommand
         $table = $model->getTable();
         $columns = Schema::getColumnListing($table);
 
-        $validationRules = array_map(function ($column) use ($table) {
+        $validationRules = [];
+        foreach ($columns as $column) {
             $type = Schema::getColumnType($table, $column);
             $rule = "'$column' => '";
 
@@ -82,19 +87,35 @@ class MakeCustomController extends GeneratorCommand
                 case 'string':
                     $rule .= 'required|string|max:255';
                     break;
+                case 'text':
+                    $rule .= 'required|string';
+                    break;
                 case 'integer':
+                case 'bigint':
+                case 'bigInteger':
                     $rule .= 'required|integer';
                     break;
                 case 'boolean':
                     $rule .= 'required|boolean';
+                    break;
+                case 'date':
+                case 'datetime':
+                case 'datetimetz':
+                case 'timestamp':
+                    $rule .= 'required|date';
+                    break;
+                case 'float':
+                case 'double':
+                case 'decimal':
+                    $rule .= 'required|numeric';
                     break;
                 default:
                     $rule .= 'required';
             }
 
             $rule .= "'";
-            return $rule;
-        }, $columns);
+            $validationRules[] = $rule;
+        }
 
         return implode(",\n            ", $validationRules);
     }

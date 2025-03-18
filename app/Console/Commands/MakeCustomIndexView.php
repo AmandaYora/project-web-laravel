@@ -74,6 +74,8 @@ class MakeCustomIndexView extends Command
                 $type = 'email';
             } elseif (stripos($field, 'tanggal') !== false || stripos($field, 'date') !== false) {
                 $type = 'date';
+            } elseif (preg_match('/(phone|telepon|hp|nim|nik|nip|kode|postal|zip|no_|num|number)/i', $field)) {
+                $type = 'number';
             } else {
                 $type = 'text';
             }
@@ -166,8 +168,16 @@ class MakeCustomIndexView extends Command
         if (strpos($currentRoutes, "/* Routes for {$modelPluralKebab} generated automatically */") === false) {
             $this->files->append($routesFile, $routeBlock);
             $this->info("Routes appended to routes/web.php");
+            $this->runPintOnFile($routesFile);
         } else {
             $this->info("Routes for {$modelPluralKebab} already exist in routes/web.php");
         }
+    }
+
+    protected function runPintOnFile($filePath)
+    {
+        $relativePath = str_replace(base_path().'/', '', $filePath);
+        $command = 'cd '.base_path().' && ./vendor/bin/pint '.escapeshellarg($relativePath);
+        exec($command, $output, $returnVar);
     }
 }
