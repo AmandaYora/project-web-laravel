@@ -43,7 +43,12 @@
                             </thead>
                             <tbody>
                                 @foreach ($users as $user)
-                                    <tr data-user="{{ json_encode($user) }}">
+                                    <tr data-user-id="{{ $user->user_id }}" 
+                                        data-name="{{ $user->name }}"
+                                        data-phone="{{ $user->phone }}" 
+                                        data-email="{{ $user->email }}"
+                                        data-username="{{ $user->username }}" 
+                                        data-role="{{ $user->role }}">
                                         <td>{{ $user->name }}</td>
                                         <td>{{ $user->phone }}</td>
                                         <td>{{ $user->email }}</td>
@@ -73,7 +78,6 @@
         </div>
     </div>
 
-    <!-- Modal for add/edit user -->
     <div class="modal fade" id="addEditUserModal" tabindex="-1" aria-labelledby="addEditUserModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -88,11 +92,11 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                            <input type="text" class="form-control" id="name" name="name" required maxlength="255">
                         </div>
                         <div class="mb-3">
                             <label for="phone" class="form-label">Phone</label>
-                            <input type="text" class="form-control" id="phone" name="phone" required>
+                            <input type="text" class="form-control" id="phone" name="phone" required maxlength="20">
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
@@ -100,11 +104,11 @@
                         </div>
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" required>
+                            <input type="text" class="form-control" id="username" name="username" required maxlength="255">
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password">
+                            <input type="password" class="form-control" id="password" name="password" minlength="6">
                             <small class="text-muted">Leave empty to keep current password when editing</small>
                         </div>
                         <div class="mb-3">
@@ -137,14 +141,13 @@
 
             $('.edit-btn').on('click', function() {
                 var row = $(this).closest('tr');
-                var user = row.data('user');
-
-                $('#user_id').val(user.user_id);
-                $('#name').val(user.name);
-                $('#phone').val(user.phone);
-                $('#email').val(user.email);
-                $('#username').val(user.username);
-                $('#role').val(user.role);
+                
+                $('#user_id').val(row.data('user-id'));
+                $('#name').val(row.data('name'));
+                $('#phone').val(row.data('phone'));
+                $('#email').val(row.data('email'));
+                $('#username').val(row.data('username'));
+                $('#role').val(row.data('role'));
             });
 
             setTimeout(function() {

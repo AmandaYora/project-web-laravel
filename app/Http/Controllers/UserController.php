@@ -17,32 +17,33 @@ class UserController extends Controller
     public function saveUser(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'phone' => 'required',
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
             'email' => 'required|email|unique:users,email,' . $request->user_id . ',user_id',
-            'username' => 'required|unique:users,username,' . $request->user_id . ',user_id',
-            'role' => 'required',
+            'username' => 'required|string|max:255|unique:users,username,' . $request->user_id . ',user_id',
+            'role' => 'required|string|in:admin,user',
+            'password' => 'nullable|string|min:6',
         ]);
 
-        $data = $request->all();
+        $data = $request->only(['name', 'phone', 'email', 'username', 'role']);
         
         $extraData = [];
-        foreach ($data as $key => $value) {
-            if (!in_array($key, ['name', 'phone', 'email', 'username', 'password', 'role', 'user_id'])) {
+        foreach ($request->all() as $key => $value) {
+            if (!in_array($key, ['name', 'phone', 'email', 'username', 'password', 'role', 'user_id', '_token'])) {
                 $extraData[$key] = $value;
-                unset($data[$key]);
             }
-        }
-
-        if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
         }
 
         if ($request->user_id) {
             $user = User::find($request->user_id);
-            if (!$request->filled('password')) {
-                unset($data['password']);
+            if (!$user) {
+                return redirect()->route('users.index')->with('error', 'User not found');
             }
+            
+            if ($request->filled('password')) {
+                $data['password'] = Hash::make($request->password);
+            }
+            
             $user->update($data);
             $user->extra = array_merge($user->extra ?? [], $extraData);
             $user->save();

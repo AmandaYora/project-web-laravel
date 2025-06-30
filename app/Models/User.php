@@ -30,4 +30,18 @@ class User extends Authenticatable
         'extra' => 'array',
         'password' => 'hashed',
     ];
+
+    protected $attributes = [
+        'extra' => '{}',
+    ];
+
+    public function setEmailAttribute($value)
+    {
+        $this->attributes['email'] = strtolower(trim($value));
+    }
+
+    public function setUsernameAttribute($value)
+    {
+        $this->attributes['username'] = strtolower(trim($value));
+    }
 }
